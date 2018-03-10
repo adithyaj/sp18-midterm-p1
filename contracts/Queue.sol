@@ -9,31 +9,34 @@ pragma solidity ^0.4.15;
 
 contract Queue {
 	/* State variables */
-	uint8 size = 5;
-	uint numInside;
+	uint8 size;
+	uint8 numInside;
 
 	bool isFull;
 	bool isEmpty;
-    
-    
+
     uint8 first;
     uint8 lastFilled;
     uint8 nextFree;
 
-    uint256 duration;
-    
     mapping (address => uint8) addr2place;
     mapping (uint8 => address) place2addr;
-    
-    
-	/* Add events */
+
+    uint timeAsFirst;
+    uint maxTimeinQ = 5 minutes;
+   	/* Add events */
 	event timeEject();
 
 
 
 	/* Add constructor */
-	function Queue(uint256 _buytime) {
-        duration = _buytime;
+	function Queue() {
+		size = 5;
+
+		first = 0;
+		lastFilled = 0;
+		isFull = false;
+		isEmpty = true;
         numInside = 0;
     }
 
@@ -46,12 +49,10 @@ contract Queue {
 	function empty() constant returns(bool) {
 		return isEmpty;
 	}
-	
 	/* Returns the address of the person in the front of the queue */
 	function getFirst() constant returns(address) {
 		return place2addr[0];
 	}
-	
 	/* Allows `msg.sender` to check their position in the queue */
 	function checkPlace() constant returns(uint8) {
         if (addr2place[msg.sender] == 0) {
@@ -62,25 +63,27 @@ contract Queue {
         		return 0;        		
         	}
         }
-        return q[msg.sender];
+        return addr2place[msg.sender];
 	}
-	
 	/* Allows anyone to expel the first person in line if their time
 	 * limit is up
 	 */
 	function checkTime() {
-		// YOUR CODE HERE
+		if (timeAsFirst + maxTimeinQ >= now) {
+			timeEject();
+			dequeue();
+		}
 	}
-	
 	/* Removes the first person in line; either when their time is up or when
 	 * they are done with their purchase
 	 */
 	function dequeue() {
 		address firstInLine = getFirst();
-		firstPlace = addr2place[firstInLine];
+		uint8 firstPlace = addr2place[firstInLine];
 		delete addr2place[firstInLine];
 		delete place2addr[firstPlace];
 		first = (first + 1) % size;
+		timeAsFirst = now;
 		numInside-=1;
 
 		if (numInside == 0) {
@@ -95,8 +98,8 @@ contract Queue {
 			revert();
 
 		}
-		
-		addr2place[addr] = nextFree;
+
+        addr2place[addr] = nextFree;
 		place2addr[nextFree] = addr;
 		lastFilled = nextFree;
 		nextFree = (lastFilled+1) % size;
@@ -104,6 +107,10 @@ contract Queue {
 
 		if (nextFree >= first) {
 			isFull = true;
+		}
+
+		if (numInside == 1) {
+			timeAsFirst = now;
 		}
 
 	}    
