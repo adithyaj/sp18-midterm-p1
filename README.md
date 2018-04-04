@@ -5,19 +5,19 @@ Welcome to the Blockchain for Developers DeCal's midterm assignment. You'll be d
 
 ###### Project Partner 1
 
-Name:
+Name: Adithya Jayachandran
 
-SID:
+SID: 25964798
 
-Email:
+Email: adithya.j@berkeley.edu
 
 ###### Project Partner 2
 
-Name:
+Name: Hamdi Allam
 
-SID:
+SID: 3033254473
 
-Email:
+Email:hallam@berkeley.edu
 
 ###### Project Partner 3 (if any)
 
